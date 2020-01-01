@@ -26,6 +26,15 @@ function logout(req, res, next) {
     });
 }
 
+async function signUpNewUser(req, res, next) {
+  try {
+    await console.log("Signing up new user...");
+    res.status(200).json({ message: "Signing up new user" });
+  } catch (err) {
+    next(err);
+  }
+}
+
 function createJwt(userId) {
   return jwt.sign({ userId }, process.env.APP_SECRET);
 }
@@ -33,5 +42,6 @@ function createJwt(userId) {
 module.exports = {
   status,
   login,
-  logout
+  logout,
+  signUpNewUser
 };
