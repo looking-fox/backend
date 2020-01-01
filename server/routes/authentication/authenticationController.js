@@ -8,11 +8,15 @@ async function status(req, res, next) {
 
 async function login(req, res, next) {
   try {
-    const token = createJwt(234234);
+    const { uid } = req.body;
+    const token = createJwt(uid);
     res.cookie("token", token, cookieOptions);
-    res.status(200).json({
-      user: { displayName: "Mock User", email: "mock@gmail.com" }
-    });
+    // Look up user
+    const loggedInUser = await knex("users")
+      .where({ uid })
+      .first();
+    // Send back user
+    res.status(200).json({ user: loggedInUser });
   } catch (err) {
     next(err);
   }
@@ -27,10 +31,23 @@ function logout(req, res, next) {
     });
 }
 
-async function signUpNewUser(req, res, next) {
+async function signUp(req, res, next) {
   try {
-    await console.log("Signing up new user...");
-    res.status(200).json({ message: "Signing up new user" });
+    const { uid, displayName, photoURL, email } = req.body.user;
+    // Create New User
+    const [newUser] = await knex("users")
+      .insert({
+        uid,
+        email,
+        display_name: displayName,
+        profile_photo_url: photoURL
+      })
+      .returning(["uid", "email", "display_name", "profile_photo_url"]);
+    // Token
+    const token = createJwt(uid);
+    res.cookie("token", token, cookieOptions);
+    // Send Back Usere
+    res.status(200).json({ user: newUser });
   } catch (err) {
     next(err);
   }
@@ -44,5 +61,5 @@ module.exports = {
   status,
   login,
   logout,
-  signUpNewUser
+  signUp
 };

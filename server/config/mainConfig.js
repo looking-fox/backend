@@ -4,7 +4,11 @@ const { json, urlencoded } = require("body-parser");
 const morgan = require("morgan");
 const logger = require("../lib/logger");
 const { allowedOrigins } = require("./configvars");
-const { getUserId, attachUserToRequest } = require("../utils/customMiddleware");
+const {
+  getUserId,
+  attachUserToRequest,
+  camelCaseResponse
+} = require("../utils/customMiddleware");
 
 function mainConfig(app) {
   app.use(
@@ -29,6 +33,7 @@ function mainConfig(app) {
   app.use(urlencoded({ extended: false }));
   app.use(getUserId);
   app.use(attachUserToRequest);
+  app.use(camelCaseResponse);
 
   if (process.env.NODE_ENV !== "test") {
     app.use(morgan("dev", { stream: logger.stream }));

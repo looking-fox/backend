@@ -1,4 +1,7 @@
 const jwt = require("jsonwebtoken");
+const knex = require("../db/connection");
+const mung = require("express-mung");
+const camelize = require("camelcase-keys-deep");
 
 function getUserId(req, res, next) {
   const { token } = req.cookies;
@@ -14,11 +17,22 @@ async function attachUserToRequest(req, res, next) {
   // if they aren't logged in, skip this
   if (!req.userId) return next();
   try {
-    req.user = { displayName: "Mocker Man", email: "mock@mockmail.io" };
+    const user = await knex("users")
+      .where({ uid: req.userId })
+      .first();
+    req.user = user;
     next();
   } catch (e) {
     next(e);
   }
 }
 
-module.exports = { getUserId, attachUserToRequest };
+function camelizeBody(body, req, res) {
+  if (body) {
+    return camelize(body);
+  }
+}
+
+const camelCaseResponse = mung.json(camelizeBody);
+
+module.exports = { getUserId, attachUserToRequest, camelCaseResponse };
