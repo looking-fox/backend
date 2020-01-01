@@ -12,9 +12,7 @@ async function login(req, res, next) {
     const token = createJwt(uid);
     res.cookie("token", token, cookieOptions);
     // Look up user
-    const loggedInUser = await knex("users")
-      .where({ uid })
-      .first();
+    const loggedInUser = await getUser(uid);
     // Send back user
     res.status(200).json({ user: loggedInUser });
   } catch (err) {
@@ -31,14 +29,18 @@ function logout(req, res, next) {
     });
 }
 
+async function getUser(uid) {
+  return await knex("users")
+    .select("uid", "email", "display_name", "profile_photo_url")
+    .where({ uid })
+    .first();
+}
+
 async function signUp(req, res, next) {
   try {
     const { uid, displayName, photoURL, email } = req.body.user;
     // Check if user exists
-    const existingUser = await knex("users")
-      .select("uid", "email", "display_name", "profile_photo_url")
-      .where({ uid })
-      .first();
+    const existingUser = await getUser(uid);
     if (existingUser) {
       const token = createJwt(uid);
       res.cookie("token", token, cookieOptions);
