@@ -34,6 +34,16 @@ function logout(req, res, next) {
 async function signUp(req, res, next) {
   try {
     const { uid, displayName, photoURL, email } = req.body.user;
+    // Check if user exists
+    const existingUser = await knex("users")
+      .select("uid", "email", "display_name", "profile_photo_url")
+      .where({ uid })
+      .first();
+    if (existingUser) {
+      const token = createJwt(uid);
+      res.cookie("token", token, cookieOptions);
+      return res.status(200).json({ user: existingUser });
+    }
     // Create New User
     const [newUser] = await knex("users")
       .insert({
@@ -46,7 +56,7 @@ async function signUp(req, res, next) {
     // Token
     const token = createJwt(uid);
     res.cookie("token", token, cookieOptions);
-    // Send Back Usere
+    // Send Back User
     res.status(200).json({ user: newUser });
   } catch (err) {
     next(err);
