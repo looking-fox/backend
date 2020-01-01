@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { cookieOptions } = require("../../config/configvars");
+const knex = require("../../db/connection");
 
 async function status(req, res, next) {
   res.status(200).json({ isAuthenticated: req.userId !== undefined });
