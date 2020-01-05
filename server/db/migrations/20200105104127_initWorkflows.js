@@ -6,6 +6,11 @@ exports.up = async function(knex, Promise) {
       .increments("wf_id")
       .unsigned()
       .primary();
+    table.string("uid").notNullable();
+    table
+      .foreign("uid")
+      .references("uid")
+      .inTable("users");
     table.string("wf_name").notNullable();
     table.string("wf_tag_color").notNullable();
     table.specificType("wf_steps", "text ARRAY").notNullable();
