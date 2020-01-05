@@ -1,3 +1,5 @@
+const { onUpdateTrigger } = require("../../../knexfile");
+
 exports.up = async function(knex, Promise) {
   await knex.schema.createTable("users", table => {
     table
@@ -18,8 +20,12 @@ exports.up = async function(knex, Promise) {
       .timestamp("created_at")
       .notNullable()
       .defaultTo(knex.raw("now()"));
-    table.timestamp("updated_at").nullable();
+    table
+      .timestamp("updated_at")
+      .notNullable()
+      .defaultTo(knex.raw("now()"));
   });
+  await knex.raw(onUpdateTrigger("users"));
 };
 
 exports.down = async function(knex, Promise) {
