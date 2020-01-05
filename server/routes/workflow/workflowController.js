@@ -1,4 +1,5 @@
 const knex = require("../../db/connection");
+const snakeCaseKeys = require("snakecase-keys");
 
 async function getWorkflows(req, res, next) {
   try {
@@ -11,9 +12,10 @@ async function getWorkflows(req, res, next) {
 
 async function addWorkflow(req, res, next) {
   try {
+    const workflow = snakeCaseKeys(req.body);
     const [newWorkflow] = await knex("workflows")
       .insert({
-        ...req.body,
+        ...workflow,
         uid: req.userId
       })
       .returning("*");
