@@ -1,9 +1,9 @@
 const { onUpdateTrigger } = require("../../../knexfile");
 
 exports.up = async function(knex, Promise) {
-  await knex.schema.createTable("workflows", table => {
+  await knex.schema.createTable("actions", table => {
     table
-      .increments("wf_id")
+      .increments("wf_action_id")
       .unsigned()
       .primary();
     table.string("uid").notNullable();
@@ -11,9 +11,14 @@ exports.up = async function(knex, Promise) {
       .foreign("uid")
       .references("uid")
       .inTable("users");
-    table.string("wf_name").notNullable();
-    table.string("wf_tag_color").notNullable();
-    table.specificType("wf_steps", "text ARRAY").notNullable();
+    table.integer("wf_id").notNullable();
+    table
+      .foreign("wf_id")
+      .references("wf_id")
+      .inTable("workflows")
+      .onDelete("CASCADE");
+    table.string("wf_action_name").notNullable();
+    table.string("wf_action_type").notNullable();
     table
       .timestamp("created_at")
       .notNullable()
@@ -23,9 +28,9 @@ exports.up = async function(knex, Promise) {
       .notNullable()
       .defaultTo(knex.raw("now()"));
   });
-  await knex.raw(onUpdateTrigger("workflows"));
+  await knex.raw(onUpdateTrigger("actions"));
 };
 
 exports.down = async function(knex, Promise) {
-  await knex.schema.dropTable("workflows");
+  await knex.schema.dropTable("actions");
 };
