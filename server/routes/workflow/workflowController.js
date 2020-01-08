@@ -52,6 +52,18 @@ async function addWorkflow(req, res, next) {
   }
 }
 
+function deleteWorkflow(req, res, next) {
+  try {
+    // const { wf_id } = req.params;
+    // await knex("workflows")
+    //   .update({ archived: true })
+    //   .where({ wf_id });
+    return res.sendStatus(200);
+  } catch (err) {
+    console.log("Error: ", err);
+  }
+}
+
 async function getIndividualWorkflow(userId, wfId) {
   const {
     rows: [workflow]
@@ -72,4 +84,4 @@ async function getIndividualWorkflow(userId, wfId) {
   return workflow;
 }
 
-module.exports = { getWorkflows, addWorkflow };
+module.exports = { getWorkflows, addWorkflow, deleteWorkflow };
