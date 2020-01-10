@@ -14,6 +14,10 @@ exports.up = async function(knex, Promise) {
     table.string("wf_name").notNullable();
     table.string("wf_tag_color").notNullable();
     table
+      .boolean("archived")
+      .notNullable()
+      .defaultTo(false);
+    table
       .timestamp("created_at")
       .notNullable()
       .defaultTo(knex.raw("now()"));
