@@ -13,7 +13,9 @@ async function getWorkflows(req, res, next) {
       group by wf_id 
       )
       select * from workflows
-      right join all_actions on workflows.wf_id = all_actions.wf_id;
+      right join all_actions on workflows.wf_id = all_actions.wf_id
+      where uid = '${req.userId}'
+      and archived is false;
     `);
     return res.status(200).json({ workflows });
   } catch (err) {
@@ -52,15 +54,15 @@ async function addWorkflow(req, res, next) {
   }
 }
 
-function deleteWorkflow(req, res, next) {
+async function archiveWorkflow(req, res, next) {
   try {
-    // const { wf_id } = req.params;
-    // await knex("workflows")
-    //   .update({ archived: true })
-    //   .where({ wf_id });
+    const { wf_id } = req.params;
+    await knex("workflows")
+      .update({ archived: true })
+      .where({ wf_id });
     return res.sendStatus(200);
   } catch (err) {
-    console.log("Error: ", err);
+    next(err);
   }
 }
 
@@ -79,9 +81,11 @@ async function getIndividualWorkflow(userId, wfId) {
       )
       select * from workflows
       right join all_actions on workflows.wf_id = all_actions.wf_id
+      where uid = '${req.userId}'
+      and archived is false
       limit 1;
     `);
   return workflow;
 }
 
-module.exports = { getWorkflows, addWorkflow, deleteWorkflow };
+module.exports = { getWorkflows, addWorkflow, archiveWorkflow };
