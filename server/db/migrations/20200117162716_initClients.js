@@ -22,6 +22,10 @@ exports.up = async function(knex, Promise) {
     table.timestamp("client_date").nullable();
     table.text("client_private_note").nullable();
     table
+      .boolean("client_archived")
+      .notNullable()
+      .defaultTo(false);
+    table
       .timestamp("created_at")
       .notNullable()
       .defaultTo(knex.raw("now()"));
