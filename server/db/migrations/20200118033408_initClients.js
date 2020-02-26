@@ -22,6 +22,10 @@ exports.up = async function(knex, Promise) {
     table.timestamp("client_date").nullable();
     table.text("client_private_note").nullable();
     table
+      .integer("current_wf_index")
+      .notNullable()
+      .defaultTo(0);
+    table
       .boolean("client_archived")
       .notNullable()
       .defaultTo(false);
