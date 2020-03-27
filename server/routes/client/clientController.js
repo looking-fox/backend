@@ -45,4 +45,13 @@ async function updateClientProgress(req, res, next) {
   }
 }
 
-module.exports = { getClients, updateClientProgress };
+async function addClient(req, res, next) {
+  try {
+    await console.log("BODY: ", req.body);
+    return res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getClients, updateClientProgress, addClient };
