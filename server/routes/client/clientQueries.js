@@ -23,7 +23,8 @@ async function queryClients(userId, clientId) {
       right join workflows on clients.wf_id = workflows.wf_id
       where clients.uid = '${userId}'
       ${clientId ? `and clients.client_id = ${clientId}` : ""}
-      and client_archived is false;
+      and client_archived is false
+      order by clients.updated_at desc;
       `);
   return clients;
 }
