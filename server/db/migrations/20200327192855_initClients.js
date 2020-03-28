@@ -20,6 +20,7 @@ exports.up = async function(knex, Promise) {
     table.string("client_email").nullable();
     table.string("client_phone").nullable();
     table.timestamp("client_date").nullable();
+    table.string("client_location").nullable();
     table.text("client_private_note").nullable();
     table
       .integer("current_wf_index")
