@@ -18,7 +18,7 @@ async function queryClients(userId, clientId) {
       order by workflows.updated_at desc)
           
       select client_id, client_full_name, client_email, client_phone, client_date,
-      client_private_note, client_archived, clients.created_at, clients.updated_at, 
+      client_location, client_private_note, client_archived, clients.created_at, clients.updated_at, 
       current_wf_index, wf_name, wf_tag_color, wf_actions from clients
       right join workflows on clients.wf_id = workflows.wf_id
       where clients.uid = '${userId}'
