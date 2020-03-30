@@ -1,10 +1,11 @@
 const knex = require("../../db/connection");
 const { generateId } = require("../../utils/utils");
+const { queryForms } = require("./formQueries");
 
 async function getForms(req, res, next) {
   try {
-    await console.log("Hit endpoint!");
-    return res.sendStatus(200);
+    const forms = await queryForms(req.userId);
+    return res.status(200).json({ forms });
   } catch (err) {
     next(err);
   }
