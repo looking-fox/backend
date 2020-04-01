@@ -1,4 +1,5 @@
 const knex = require("../../db/connection");
+const snakeCaseKeys = require("snakecase-keys");
 const { generateId } = require("../../utils/utils");
 const { queryForms } = require("./formQueries");
 
@@ -15,6 +16,37 @@ async function addNewForm(req, res, next) {
   try {
     const newFormId = await generateId();
     console.log("New Form ID: ", newFormId);
+    return res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function addFormDraft(req, res, next) {
+  try {
+    const { body: newForm } = req;
+    const { formFields: newFormFields } = newForm;
+
+    delete newForm["formFields"];
+    newForm["formDraftOf"] = newForm.formId;
+    newForm["formLink"] = await generateId();
+    delete newForm["formId"];
+
+    const [formId] = await knex("forms")
+      .insert(snakeCaseKeys(newForm))
+      .returning("form_id");
+
+    const newFormFieldsWithId = newFormFields.map(field => {
+      field["formId"] = formId;
+      delete field["createdAt"];
+      delete field["updatedAt"];
+      delete field["formFieldId"];
+      return field;
+    });
+
+    await knex("form_fields").insert(snakeCaseKeys(newFormFieldsWithId));
+    const updatedForm = await queryForms(req.userId, formId);
+
     return res.sendStatus(200);
   } catch (err) {
     next(err);
@@ -41,4 +73,10 @@ async function deleteForm(req, res, next) {
   }
 }
 
-module.exports = { getForms, addNewForm, updateForm, deleteForm };
+module.exports = {
+  getForms,
+  addNewForm,
+  addFormDraft,
+  updateForm,
+  deleteForm
+};

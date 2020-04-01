@@ -1,6 +1,6 @@
 const knex = require("../../db/connection");
 
-async function queryForms(userId) {
+async function queryForms(userId, formId) {
   const { rows: forms } = await knex.raw(`
     with form_fields as (
     select new_row.form_id, array_agg(row_to_json(new_row)) as form_fields
@@ -14,6 +14,7 @@ async function queryForms(userId) {
     select * from forms
     right join form_fields on form_fields.form_id = forms.form_id
     where uid = '${userId}';  
+    ${formId ? `and form_id = '${formId}'` : null};
     `);
   return forms;
 }
