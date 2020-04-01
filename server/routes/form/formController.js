@@ -21,4 +21,24 @@ async function addNewForm(req, res, next) {
   }
 }
 
-module.exports = { getForms, addNewForm };
+async function updateForm(req, res, next) {
+  try {
+    await console.log("Hit UPDATE Endpoint!");
+    console.log("BODY: ", req.body);
+    console.log("PARAMS: ", req.params);
+    return res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function deleteForm(req, res, next) {
+  try {
+    await console.log("Hit DELETE Endpoint!");
+    return res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getForms, addNewForm, updateForm, deleteForm };

@@ -4,6 +4,8 @@ const formController = require("./formController");
 
 router
   .get("/", formController.getForms)
-  .post("/new", formController.addNewForm);
+  .post("/", formController.addNewForm)
+  .put("/", formController.updateForm)
+  .delete("/:formId", formController.deleteForm);
 
 module.exports = router;
