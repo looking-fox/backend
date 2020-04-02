@@ -14,7 +14,7 @@ async function queryForms(userId, formId) {
     select * from forms
     right join form_fields on form_fields.form_id = forms.form_id
     where uid = '${userId}';  
-    ${formId ? `and form_id = '${formId}'` : null};
+    ${formId ? `and form_id = '${formId}'` : ""};
     `);
   return forms;
 }
