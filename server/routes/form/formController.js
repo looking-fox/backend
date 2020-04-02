@@ -26,6 +26,7 @@ async function addFormDraft(req, res, next) {
   try {
     const { body: newForm } = req;
     const { formFields: newFormFields } = newForm;
+    const previousFormId = newForm.formId;
 
     delete newForm["formFields"];
     newForm["formDraftOf"] = newForm.formId;
@@ -45,9 +46,17 @@ async function addFormDraft(req, res, next) {
     });
 
     await knex("form_fields").insert(snakeCaseKeys(newFormFieldsWithId));
-    const updatedForm = await queryForms(req.userId, formId);
+    const [updatedForm] = await queryForms(req.userId, formId);
 
-    return res.sendStatus(200);
+    return res.status(200).json({ updatedForm, previousFormId });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updateFormDraft(req, res, next) {
+  try {
+    console.log("Hit new PUT endpoint for draft forms!");
   } catch (err) {
     next(err);
   }
@@ -77,6 +86,7 @@ module.exports = {
   getForms,
   addNewForm,
   addFormDraft,
+  updateFormDraft,
   updateForm,
   deleteForm
 };
