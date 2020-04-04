@@ -37,7 +37,7 @@ async function addFormDraft(req, res, next) {
       .insert(snakeCaseKeys(newForm))
       .returning("form_id");
 
-    const newFormFieldsWithId = newFormFields.map(field => {
+    const newFormFieldsWithId = newFormFields.map((field) => {
       field["formId"] = formId;
       delete field["createdAt"];
       delete field["updatedAt"];
@@ -56,7 +56,20 @@ async function addFormDraft(req, res, next) {
 
 async function updateFormDraft(req, res, next) {
   try {
-    console.log("Hit new PUT endpoint for draft forms!");
+    let { body: updatedForm } = req;
+    const { formFields } = updatedForm;
+    delete updatedForm["formFields"];
+    const formId = +req.params.formId;
+    // Delete existing form and add new form
+    await knex("forms").where({ form_id: formId }).del();
+    await knex("forms").insert(snakeCaseKeys(updatedForm));
+    // Format form fields and insert into table
+    const formattedFormFields = formFields.map((field) => {
+      delete field["form_field_id"];
+      return field;
+    });
+    await knex("form_fields").insert(snakeCaseKeys(formattedFormFields));
+    return res.sendStatus(200);
   } catch (err) {
     next(err);
   }
@@ -88,5 +101,5 @@ module.exports = {
   addFormDraft,
   updateFormDraft,
   updateForm,
-  deleteForm
+  deleteForm,
 };
