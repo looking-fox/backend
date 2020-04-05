@@ -11,8 +11,10 @@ async function queryForms(userId, formId) {
     group by new_row.form_id
     )
         
-    select * from forms
-    right join form_fields on form_fields.form_id = forms.form_id
+    select forms.form_id, forms.form_link, forms.uid, forms.form_title,
+    forms.form_active, forms.form_draft_of, forms.created_at, forms.updated_at,
+    coalesce(form_fields, '{}') as form_fields from forms 
+    left join form_fields on form_fields.form_id = forms.form_id
     where forms.form_id not in 
         (select forms.form_draft_of from forms 
         where forms.form_draft_of is not null)
