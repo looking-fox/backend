@@ -101,14 +101,15 @@ async function publishForm(req, res, next) {
     // delete the existing form
     await knex("forms").where({ form_link: publishedFormLink }).del();
     // assign draft the form link, change status to active, remove formDraftOf
-    const [newPublishedForm] = await knex("forms")
+    await knex("forms")
       .update({
         form_link: publishedFormLink,
         form_active: true,
         form_draft_of: null,
       })
-      .where({ form_id: formId })
-      .returning("*");
+      .where({ form_id: formId });
+    // grab published form and associated form fields
+    const [newPublishedForm] = await queryForms(req.userId, formId);
 
     res.status(200).json({ newPublishedForm, formId: +formId });
   } catch (err) {
