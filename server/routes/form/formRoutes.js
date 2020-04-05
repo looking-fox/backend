@@ -8,6 +8,7 @@ router
   .post("/draft", formController.addFormDraft)
   .put("/draft/:formId", formController.updateFormDraft)
   .put("/:formId", formController.updateForm)
+  .put("/publish/:formId", formController.publishForm)
   .delete("/:formId", formController.deleteForm);
 
 module.exports = router;

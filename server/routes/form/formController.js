@@ -86,6 +86,36 @@ async function updateForm(req, res, next) {
   }
 }
 
+async function publishForm(req, res, next) {
+  try {
+    const { formId } = req.params;
+    // extract active form's form link
+    const { form_draft_of: publishedFormId } = await knex("forms")
+      .select("form_draft_of")
+      .where({ form_id: formId })
+      .first();
+    const { form_link: publishedFormLink } = await knex("forms")
+      .select("form_link")
+      .where({ form_id: publishedFormId })
+      .first();
+    // delete the existing form
+    await knex("forms").where({ form_link: publishedFormLink }).del();
+    // assign draft the form link, change status to active, remove formDraftOf
+    const [newPublishedForm] = await knex("forms")
+      .update({
+        form_link: publishedFormLink,
+        form_active: true,
+        form_draft_of: null,
+      })
+      .where({ form_id: formId })
+      .returning("*");
+
+    res.status(200).json({ newPublishedForm, formId: +formId });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function deleteForm(req, res, next) {
   try {
     await console.log("Hit DELETE Endpoint!");
@@ -99,6 +129,7 @@ module.exports = {
   getForms,
   addNewForm,
   addFormDraft,
+  publishForm,
   updateFormDraft,
   updateForm,
   deleteForm,
