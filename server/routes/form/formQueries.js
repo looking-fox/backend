@@ -13,7 +13,10 @@ async function queryForms(userId, formId) {
         
     select * from forms
     right join form_fields on form_fields.form_id = forms.form_id
-    where uid = '${userId}'
+    where forms.form_id not in 
+        (select forms.form_draft_of from forms 
+        where forms.form_draft_of is not null)
+    and uid = '${userId}'
     ${formId ? `and forms.form_id = '${formId}'` : ""};
     `);
   return forms;
