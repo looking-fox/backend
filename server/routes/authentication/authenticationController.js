@@ -3,7 +3,16 @@ const { cookieOptions } = require("../../config/configvars");
 const knex = require("../../db/connection");
 
 async function status(req, res, next) {
-  res.status(200).json({ isAuthenticated: req.userId !== undefined });
+  try {
+    if (!req.userId) {
+      res.status(200).json({ isAuthenticated: false });
+    } else {
+      const loggedInUser = await getUser(req.userId);
+      res.status(200).json({ user: loggedInUser });
+    }
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function login(req, res, next) {
@@ -21,12 +30,9 @@ async function login(req, res, next) {
 }
 
 function logout(req, res, next) {
-  res
-    .status(200)
-    .clearCookie("token", cookieOptions)
-    .json({
-      message: "Logged Out"
-    });
+  res.status(200).clearCookie("token", cookieOptions).json({
+    message: "Logged Out",
+  });
 }
 
 async function getUser(uid) {
@@ -52,7 +58,7 @@ async function signUp(req, res, next) {
         uid,
         email,
         display_name: displayName,
-        profile_photo_url: photoURL
+        profile_photo_url: photoURL,
       })
       .returning(["uid", "email", "display_name", "profile_photo_url"]);
     // Token
@@ -73,5 +79,5 @@ module.exports = {
   status,
   login,
   logout,
-  signUp
+  signUp,
 };

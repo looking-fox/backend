@@ -17,7 +17,8 @@ async function queryForms(userId, formId) {
         (select forms.form_draft_of from forms 
         where forms.form_draft_of is not null)
     and uid = '${userId}'
-    ${formId ? `and forms.form_id = '${formId}'` : ""};
+    ${formId ? `and forms.form_id = '${formId}'` : ""}
+    order by forms.created_at desc;
     `);
   return forms;
 }
