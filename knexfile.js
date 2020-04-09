@@ -1,7 +1,7 @@
-const databaseName = "looking_fox_db";
+const databaseName = "lookingfox_db";
 
 require("dotenv").config({
-  path: "production.env"
+  path: "production.env",
 });
 const path = require("path");
 module.exports = {
@@ -9,13 +9,13 @@ module.exports = {
     client: "postgresql",
     connection: `postgres://localhost:5432/${databaseName}`,
     migrations: {
-      directory: path.join(__dirname, "/server/db/migrations")
+      directory: path.join(__dirname, "/server/db/migrations"),
     },
     seeds: {
-      directory: path.join(__dirname, "/server/db/seeds")
+      directory: path.join(__dirname, "/server/db/seeds"),
     },
     debug: false,
-    asyncStackTraces: true
+    asyncStackTraces: true,
   },
   staging: {
     client: "postgresql",
@@ -25,29 +25,29 @@ module.exports = {
       port: 5432,
       user: process.env.STAGING_DB_USER,
       password: process.env.STAGING_DB_PASS,
-      ssl: true
+      ssl: true,
     },
     migrations: {
-      directory: path.join(__dirname, "/server/db/migrations")
+      directory: path.join(__dirname, "/server/db/migrations"),
     },
     seeds: {
-      directory: path.join(__dirname, "/server/db/seeds")
-    }
+      directory: path.join(__dirname, "/server/db/seeds"),
+    },
   },
   test: {
     client: "postgresql",
     connection: `postgres://localhost:5432/${databaseName}_test`,
     migrations: {
-      directory: path.join(__dirname, "/server/db/migrations")
+      directory: path.join(__dirname, "/server/db/migrations"),
     },
     seeds: {
-      directory: path.join(__dirname, "/server/db/seeds")
-    }
+      directory: path.join(__dirname, "/server/db/seeds"),
+    },
   },
-  onUpdateTrigger: table => `
+  onUpdateTrigger: (table) => `
     CREATE TRIGGER ${table}_updated_at
     BEFORE UPDATE ON ${table}
     FOR EACH ROW
     EXECUTE PROCEDURE on_update_timestamp();
-  `
+  `,
 };
