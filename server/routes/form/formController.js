@@ -14,9 +14,27 @@ async function getForms(req, res, next) {
 
 async function addNewForm(req, res, next) {
   try {
-    const newFormId = await generateId();
-    console.log("New Form ID: ", newFormId);
-    return res.sendStatus(200);
+    const newFormLink = await generateId();
+    // Create default form
+    const [formId] = await knex("forms")
+      .insert({
+        uid: req.userId,
+        form_link: newFormLink,
+        form_title: "New Form",
+        form_active: false,
+      })
+      .returning("form_id");
+    // Create default form field
+    await knex("form_fields").insert({
+      uid: req.userId,
+      form_id: formId,
+      form_field_title: "What is Your Name?",
+      form_field_type: "SHORT_ANSWER",
+      form_field_order: 0,
+    });
+    // Query new form
+    const [newForm] = await queryForms(req.userId, formId);
+    return res.status(200).json({ newForm });
   } catch (err) {
     next(err);
   }
