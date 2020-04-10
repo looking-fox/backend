@@ -29,6 +29,8 @@ async function addNewForm(req, res, next) {
       uid: req.userId,
       form_id: formId,
       form_field_title: "What is Your Name?",
+      form_field_description: "",
+      form_field_placeholder: "",
       form_field_type: "SHORT_ANSWER",
       form_field_order: 0,
     });
