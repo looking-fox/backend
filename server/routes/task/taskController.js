@@ -1,10 +1,10 @@
 const knex = require("../../db/connection");
+const snakeCaseKeys = require("snakecase-keys");
 const { queryTasks } = require("./taskQueries");
 
 async function getTasks(req, res, next) {
   try {
     const taskColumns = await queryTasks(req.userId);
-    console.log(req.userId);
     res.status(200).json({ taskColumns });
   } catch (err) {
     next(err);
@@ -27,9 +27,12 @@ async function addTask(req, res, next) {
 async function updateTask(req, res, next) {
   try {
     const { task } = req.body;
-    console.log("Task: ", task);
-    await console.log("PARAMS: ", req.params);
-    res.sendStatus(200);
+    const taskId = +req.params.taskId;
+    const [updatedTask] = await knex("tasks")
+      .update(snakeCaseKeys(task))
+      .where({ task_id: taskId })
+      .returning("*");
+    res.status(200).json({ updatedTask, taskId });
   } catch (err) {
     next(err);
   }
