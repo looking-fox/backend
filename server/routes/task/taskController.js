@@ -14,7 +14,7 @@ async function getTasks(req, res, next) {
 async function addTask(req, res, next) {
   try {
     const { columnId } = req.body;
-    const [newTask] = await knex("tasks")
+    let [newTask] = await knex("tasks")
       .insert({ uid: req.userId, task_column_id: columnId })
       .returning("*");
     newTask.isNew = true;
@@ -28,10 +28,15 @@ async function updateTask(req, res, next) {
   try {
     const { task } = req.body;
     const taskId = +req.params.taskId;
+    // update task
     const [updatedTask] = await knex("tasks")
       .update(snakeCaseKeys(task))
       .where({ task_id: taskId })
       .returning("*");
+    // attach task actions array
+    const taskActions = await knex("task_actions").where({ task_id: taskId });
+    updatedTask.taskActions = taskActions;
+    // send back results
     res.status(200).json({ updatedTask, taskId });
   } catch (err) {
     next(err);
