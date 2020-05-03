@@ -14,12 +14,12 @@ async function getTasks(req, res, next) {
 
 async function addTask(req, res, next) {
   try {
-    const { columnId } = req.body;
+    const { location } = req.body;
     let [newTask] = await knex("tasks")
-      .insert({ uid: req.userId, task_column_id: columnId })
+      .insert({ uid: req.userId, ...snakeCaseKeys(location) })
       .returning("*");
     newTask.isNew = true;
-    res.status(200).json({ newTask, columnId });
+    res.status(200).json({ newTask });
   } catch (err) {
     next(err);
   }
@@ -76,11 +76,13 @@ async function updateFullTask(req, res, next) {
 async function updateTaskLocation(req, res, next) {
   try {
     const taskId = +req.params.taskId;
-    const { location } = req.body;
+    const { currentColumnId, newColumnId, newColumnIndex } = req.body.location;
     await knex("tasks")
-      .update(snakeCaseKeys({ ...location }))
+      .update({ task_column_id: newColumnId })
       .where({ task_id: taskId });
-    res.sendStatus(200);
+    res
+      .status(200)
+      .json({ taskId, newColumnIndex, currentColumnId, newColumnId });
   } catch (err) {
     next(err);
   }
