@@ -11,10 +11,7 @@ exports.up = async function (knex, Promise) {
     table.foreign("client_id").references("client_id").inTable("clients");
 
     table.integer("task_column_id").notNullable();
-    table
-      .foreign("task_column_id")
-      .references("task_column_id")
-      .inTable("task_columns");
+    table.integer("task_row_index").notNullable();
 
     table.string("task_title").nullable();
     table.string("task_priority").nullable();
