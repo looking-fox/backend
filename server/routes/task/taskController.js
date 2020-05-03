@@ -73,4 +73,23 @@ async function updateFullTask(req, res, next) {
   }
 }
 
-module.exports = { getTasks, addTask, updatePartialTask, updateFullTask };
+async function updateTaskLocation(req, res, next) {
+  try {
+    const taskId = +req.params.taskId;
+    const { location } = req.body;
+    await knex("tasks")
+      .update(snakeCaseKeys({ ...location }))
+      .where({ task_id: taskId });
+    res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = {
+  getTasks,
+  addTask,
+  updatePartialTask,
+  updateFullTask,
+  updateTaskLocation,
+};
