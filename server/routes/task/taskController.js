@@ -1,6 +1,7 @@
 const knex = require("../../db/connection");
 const snakeCaseKeys = require("snakecase-keys");
 const { queryTasks } = require("./taskQueries");
+const { batchUpdate } = require("../../utils/utils");
 
 async function getTasks(req, res, next) {
   try {
@@ -24,7 +25,7 @@ async function addTask(req, res, next) {
   }
 }
 
-async function updateTask(req, res, next) {
+async function updatePartialTask(req, res, next) {
   try {
     const { task } = req.body;
     const taskId = +req.params.taskId;
@@ -43,4 +44,33 @@ async function updateTask(req, res, next) {
   }
 }
 
-module.exports = { getTasks, addTask, updateTask };
+async function updateFullTask(req, res, next) {
+  try {
+    const { task } = req.body;
+    const taskId = +req.params.taskId;
+    const { taskActions, clientFullName } = task || {};
+    // remove props not in task table
+    delete task["taskActions"];
+    delete task["clientFullName"];
+    // update task
+    const [updatedTask] = await knex("tasks")
+      .update(snakeCaseKeys(task))
+      .where({ task_id: taskId })
+      .returning("*");
+    // update task actions
+    await batchUpdate(
+      "task_actions",
+      "task_action_id",
+      snakeCaseKeys(taskActions)
+    );
+    // attach properties not stored in task table
+    updatedTask.taskActions = taskActions;
+    updatedTask.clientFullName = clientFullName;
+    // send back results
+    res.status(200).json({ updatedTask, taskId });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getTasks, addTask, updatePartialTask, updateFullTask };
