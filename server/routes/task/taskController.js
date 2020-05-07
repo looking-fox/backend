@@ -76,13 +76,12 @@ async function updateFullTask(req, res, next) {
 async function updateTaskLocation(req, res, next) {
   try {
     const taskId = +req.params.taskId;
-    const { currentColumnId, newColumnId, newColumnIndex } = req.body.location;
+    const { newColumnId, newIndex } = req.body.taskCard;
+
     await knex("tasks")
-      .update({ task_column_id: newColumnId })
+      .update({ task_column_id: newColumnId, task_row_index: newIndex })
       .where({ task_id: taskId });
-    res
-      .status(200)
-      .json({ taskId, newColumnIndex, currentColumnId, newColumnId });
+    res.status(200).json({ taskId, taskCard: req.body.taskCard });
   } catch (err) {
     next(err);
   }
